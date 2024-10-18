@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>List Facility</title>
+</head>
+<body>
+    <h2>List Facility</h2>
+    
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Fee</th>
+        </tr>
+        <tr th:each="facility : ${listFacility}">
+            <td th:text="${facility.name}"></td>
+            <td th:text="${facility.fee}"></td>
+        </tr>
+    </table>
+    
+    <a th:href="@{/facility/add}">Add New Facility</a>
+</body>
+</html>

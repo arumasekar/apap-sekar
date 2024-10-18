@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <title>Room Detail</title>
+    <style>
+        .header-purple {
+            background-color: #663399;
+            color: white;
+        }
+
+        .table th {
+            background-color: #663399;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar('rooms')}"></nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="mb-4">
+                    <div class="row mb-2">
+                        <div class="col-md-3 fw-bold">Room ID</div> <!-- Bold Text -->
+                        <div class="col-md-9">: <span th:text="${room.id}">RM0002</span></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-3 fw-bold">Room Name</div> <!-- Bold Text -->
+                        <div class="col-md-9">: <span th:text="${room.name}">Mawar Regular</span></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-3 fw-bold">Max Capacity</div> <!-- Bold Text -->
+                        <div class="col-md-9">: <span th:text="${room.maxCapacity + ' Pax'}">10 Pax</span></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-3 fw-bold">Price</div> <!-- Bold Text -->
+                        <div class="col-md-9">: Rp<span th:text="${room.pricePerDay + '/Day'}">150000/Day</span></div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-3 fw-bold">Description</div> <!-- Bold Text -->
+                        <div class="col-md-9">: <span th:text="${room.description}"></span></div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5 class="fw-bold">Patient</h5> <!-- Bold Text -->
+                    <form th:action="@{/room/{id}(id=${room.id})}" method="GET" class="mb-3">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-auto">
+                                <label class="col-form-label">Reservation Date In</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="date" class="form-control" name="dateIn" th:value="${dateIn}">
+                            </div>
+                            <div class="col-auto">
+                                <label class="col-form-label">Reservation Date Out</label>
+                            </div>
+                            <div class="col-auto">
+                                <input type="date" class="form-control" name="dateOut" th:value="${dateOut}">
+                            </div>
+                            <div class="col-auto">
+                                <button type="submit" class="btn btn-primary">Apply</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div th:if="${dateIn != null && dateOut != null}">
+                        <p>Quota Available: <span
+                                th:text="${room.maxCapacity - (room.reservations != null ? room.reservations.size() : 0)}">5</span>
+                        </p>
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Email</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="reservation, stat : ${room.reservations}">
+                                <td th:text="${stat.count}">1</td>
+                                <td th:text="${reservation.patient.name}">Andy Dufrane</td>
+                                <td th:text="${reservation.patient.gender}">Male</td>
+                                <td th:text="${reservation.patient.email}">andy@gmail.com</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination-container">
+                    <div class="rows-per-page">
+                        <span>Rows per page:</span>
+                        <select class="form-select form-select-sm d-inline-block" style="width: auto;">
+                            <option>10</option>
+                        </select>
+                    </div>
+                    <div class="pagination-info ms-3">
+                        <span>1-10 of 14</span>
+                    </div>
+                    <div class="pagination-controls ms-3">
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary ms-2">
+                            <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex justify-content-between"> <!-- Back ke kiri, Update & Delete ke kanan -->
+                    <a th:href="@{/room}" class="btn btn-secondary">Back</a>
+                    <div>
+                        <a th:href="@{/room/{id}/update(id=${room.id})}" class="btn btn-warning me-2">Update</a>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
+                            Delete
+                        </button>
+                    </div>
+                </div>
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Delete Room</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete <span th:text="${room.name}"></span> room?
+                            </div>
+                            <div class="modal-footer">
+                                <form th:action="@{/room/{id}/delete(id=${room.id})}" method="post">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-danger">Yes</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+            <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+
+</html>

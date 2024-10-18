@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Patient</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .centered {
+            text-align: center;
+            margin-top: 20%;
+        }
+        .form-container {
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container centered">
+        <h2 class="mb-4">Search Patient</h2>
+        <div class="form-container">
+            <form th:action="@{/patients/search}" method="post">
+                <div class="form-group">
+                    <label for="nik">NIK</label>
+                    <input type="text" class="form-control" id="nik" name="nik" placeholder="NIK" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

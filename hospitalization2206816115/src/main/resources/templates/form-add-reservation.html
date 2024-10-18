@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Create Reservation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h3>Step 2 of 3</h3>
+                <h4>Find Room for Patient</h4>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/reservations/create}" 
+                      th:object="${reservationDTO}" 
+                      method="POST"
+                      id="reservationForm">
+
+                    <!-- Nurse Assignment Dropdown -->
+                    <div class="mb-3">
+                        <label class="form-label">Assigned Nurse</label>
+                        <select class="form-select" th:field="*{nurseId}" required>
+                            <option value="">Select a nurse</option>
+                            <option th:each="nurse : ${nurses}"
+                                    th:value="${nurse.id}"
+                                    th:text="${nurse.name}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Reservation Date In</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   th:field="*{dateIn}"
+                                   th:min="${#temporals.format(#temporals.createNow(), 'yyyy-MM-dd')}"
+                                   required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Reservation Date Out</label>
+                            <input type="date" 
+                                   class="form-control" 
+                                   th:field="*{dateOut}"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="text-end mb-3">
+                        <button type="button" 
+                                class="btn btn-primary" 
+                                onclick="searchRooms()">
+                            Search
+                        </button>
+                    </div>
+
+                    <div class="mb-3" id="roomSelection" style="display: none;">
+                        <label class="form-label">Room</label>
+                        <select class="form-select" 
+                                th:field="*{roomId}" 
+                                required>
+                            <option value="">Select a room</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" 
+                                class="btn btn-secondary" 
+                                id="continueBtn" 
+                                disabled>
+                            Continue
+                        </button>
+                        <a th:href="@{/patients/search}" 
+                           class="btn btn-danger">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function searchRooms() {
+            const dateIn = document.querySelector('[name="dateIn"]').value;
+            const dateOut = document.querySelector('[name="dateOut"]').value;
+            
+            if (!dateIn || !dateOut) {
+                alert('Please select both dates');
+                return;
+            }
+
+            fetch(`/reservations/search-rooms?dateIn=${dateIn}&dateOut=${dateOut}`)
+                .then(response => response.json())
+                .then(rooms => {
+                    const select = document.querySelector('[name="roomId"]');
+                    select.innerHTML = '<option value="">Select a room</option>';
+                    
+                    rooms.forEach(room => {
+                        const option = document.createElement('option');
+                        option.value = room.id;
+                        option.textContent = `${room.name} (Rp${room.pricePerDay}/Day, ${room.quota} Quota Available, Max ${room.maxCapacity} Pax)`;
+                        select.appendChild(option);
+                    });
+
+                    document.getElementById('roomSelection').style.display = 'block';
+                    enableContinueButton();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error searching for rooms');
+                });
+        }
+
+        function enableContinueButton() {
+            const dateIn = document.querySelector('[name="dateIn"]').value;
+            const dateOut = document.querySelector('[name="dateOut"]').value;
+            const roomId = document.querySelector('[name="roomId"]').value;
+            
+            document.getElementById('continueBtn').disabled = !(dateIn && dateOut && roomId);
+        }
+
+        // Add event listeners to form inputs
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('change', enableContinueButton);
+        });
+
+        // Script untuk redirect ke halaman /add-facilities setelah form di-submit
+        document.getElementById("reservationForm").addEventListener("submit", function (e) {
+            e.preventDefault();  // Mencegah submit default
+
+            // Dapatkan form data
+            const formData = new FormData(this);
+
+            // Kirim request POST untuk menyimpan reservasi
+            fetch(this.action, {
+                method: "POST",
+                body: formData
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      // Redirect ke halaman /add-facilities setelah reservasi berhasil
+                      window.location.href = `/add-facilities?reservationId=${data.reservationId}`;
+                  } else {
+                      alert("Error creating reservation");
+                  }
+              })
+              .catch(error => {
+                  console.error("Error:", error);
+                  alert("Error creating reservation");
+              });
+        });
+    </script>
+</body>
+</html>

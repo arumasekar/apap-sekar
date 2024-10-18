@@ -1,0 +1,16 @@
+spring:
+    application:
+        name: hospitalization2206816115
+    datasource:
+        url: jdbc:postgresql://localhost:15001/hospitalization2206816115
+        username: postgres
+        password: secret99
+    jpa:
+        properties: 
+            hibernate:
+                jdbc:
+                    lob:
+                        non-contextual-creation: true
+                dialect: org.hibernate.dialect.PostgreSQLDialect
+        hibernate:
+            ddl-auto: create

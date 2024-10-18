@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" />
+    <title>Rooms</title>
+    <style>
+        .header-purple {
+            background-color: #663399;
+            color: white;
+        }
+        .table th {
+            background-color: #663399;
+            color: white;
+        }
+        .search-container {
+            display: flex;
+            justify-content: flex-end;
+            margin: 20px 0;
+        }
+        .pagination-container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .rows-per-page {
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav th:replace="~{fragments/navbar :: navbar('rooms')}"></nav>
+    
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <h2>Rooms</h2>
+            <a href="/room/create" class="btn btn-primary">Add Room</a>
+        </div>
+
+        <div class="search-container">
+            <div class="input-group" style="width: 300px;">
+                <span class="input-group-text">Search</span>
+                <input type="text" class="form-control" placeholder="Search...">
+            </div>
+        </div>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Max Capacity</th>
+                    <th>Price Per Day</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="room, roomStat : ${listRoom}">
+                    <td th:text="${roomStat.count}">1</td>
+                    <td th:text="${room.id}">RM001</td>
+                    <td th:text="${room.name}">Mawar Premium</td>
+                    <td th:text="${room.maxCapacity} + ' pax'">2 pax</td>
+                    <td th:text="'Rp' + ${room.pricePerDay}">Rp200000</td>
+                    <td>
+                        <a th:href="@{/room/{id}(id=${room.id})}" class="btn btn-primary btn-sm">Detail</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="pagination-container">
+            <div class="rows-per-page">
+                <span>Rows per page:</span>
+                <select class="form-select form-select-sm d-inline-block" style="width: auto; margin-left: 10px;">
+                    <option>10</option>
+                    <option>25</option>
+                    <option>50</option>
+                </select>
+            </div>
+            <div class="pagination-info">
+                <span>1-10 of 14</span>
+            </div>
+            <div class="pagination-controls ms-3">
+                <button class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary ms-2">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+        crossorigin="anonymous"></script>
+</body>
+</html>

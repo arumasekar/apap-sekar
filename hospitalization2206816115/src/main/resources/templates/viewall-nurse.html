@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All Nurses</title>
+    
+</head>
+<body>
+<div class="container">
+    <div class="card m-4 p-4">
+        <div class="card-body">
+            <h2>All Nurses</h2>
+            <br>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Gender</th>
+                        <th>Created Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="nurse, iterationStatus : ${listNurse}">
+                        <td th:text="${iterationStatus.count}">1</td>
+                        <td th:text="${nurse.name}">Name</td>
+                        <td th:text="${nurse.email}">Email</td>
+                        <td th:text="${nurse.gender ? 'L' : 'P'}">Gender</td>
+                        <td th:text="${#temporals.format(nurse.createdDate, 'dd-MM-yyyy HH:mm')}">Created Date</td>
+                    </tr>
+                </tbody>
+            </table>
+            <br>
+            <a class="btn btn-primary" href="/nurse/add">Add New Nurse</a>
+            <a class="btn btn-secondary" href="/">Back to Home</a>
+        </div>
+    </div>
+</div>
+</body>
+</html>
